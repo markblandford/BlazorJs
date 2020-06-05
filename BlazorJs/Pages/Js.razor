@@ -1,0 +1,82 @@
+@page "/js"
+@inject IJSRuntime JSRuntime;
+
+<h1>Using JavaScript</h1>
+
+<p>Here we are able to call native JavaScript methods from C# and vice-versa. Blazor is able to inject a JavaScript run-time from which it can call methods from loaded scripts.
+</p>
+
+<div class="section">
+    <h2>Use C# for mathmatic calculations</h2>
+    <p>Using the <code>/js/math.js</code> script, compare the result of some simple calculations in JavaScript vs C# (highlighting the issue with floating-point numbers)</p>
+    <table class="table" id="math-compare-table">
+        <caption>How does Maths Work?</caption>
+        <thead>
+            <tr>
+                <td></td>
+                <th scope="col">
+                    <img src="images/js.png" alt="JavaScript"/>
+                </th>
+                <th scope="col">
+                    <img src="images/csharp.png" alt="C#"/>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var m in mathResults)
+            {
+                <tr>
+                    <th scope="row">@m.Calculation</th>
+                    <td>@m.JsResult</td>
+                    <td>@m.CSharpResult</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="section">
+    <h2>Use JavaScript from C# to show an alert</h2>
+
+    <p>Here we're calling a C# method which then calls a JavaScript method to show the native browser alert.</p>
+    <button type="button" class="btn btn-primary" @onclick="ShowAlert">Show Alert</button>
+</div>
+<div class="section">
+    <h2>Use JavaScript functionality not natively available in C#</h2>
+
+    <p>In C# (ASP) it is not very straight-forward to write to the browser console.</p>
+    <p>Here, we are able to write to the browser console by calling a JS method.</p>
+    <input type="text" id="console" @bind="ConsoleValue"/>
+    <button type="button" class="btn btn-primary" @onclick="Log">Log to Browser Console</button>
+</div>
+
+@code {
+    private string ConsoleValue { get; set; }
+
+    private MathResult[] mathResults = {
+        new MathResult("0.1 + 0.2") { CSharpResult = 0.1 + 0.2 },
+        new MathResult("0.1 + 0.7") { CSharpResult = 0.1 + 0.7 }
+    };
+
+    protected override void OnInitialized()
+    {
+        ConsoleValue = "**test value**";
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        for (int i = 0; i < mathResults.Length; i++)
+        {
+            mathResults[i].JsResult = await JSRuntime.InvokeAsync<decimal>("getCalculationResultJS", i);
+        }
+    }
+
+    private async Task ShowAlert()
+    {
+        await JSRuntime.InvokeVoidAsync("showAlertJS", "Hi, I was called from C# code");
+    }
+
+    private async Task Log()
+    {
+        await JSRuntime.InvokeVoidAsync("logToConsoleJS", ConsoleValue);
+    }
+}

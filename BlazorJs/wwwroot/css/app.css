@@ -140,6 +140,12 @@ h2 {
     margin-top:25px;
 }
 
+.section {
+    padding: 10px 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid gray;
+}
+
 @media (max-width: 767.98px) {
     .main .top-row:not(.auth) {
         display: none;
