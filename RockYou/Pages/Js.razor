@@ -1,7 +1,12 @@
 @page "/js"
+@inject IJSRuntime JSRuntime;
 
 <h1>Using JavaScript</h1>
 
+<p>Here we are able to call native JavaScript methods from C#. Blazor is able to inject a JavaScript run-time from which it can call methods from loaded scripts.
+</p>
+
+<p>Using the <code>/js/math.js</code> script, compare the result of some simple calculations in JavaScript vs C# (highlighting the issue with floating-point numbers)</p>
 <table class="table" id="math-compare-table">
     <caption>How does Maths Work?</caption>
     <thead>
@@ -30,14 +35,16 @@
 
 @code {
     private MathResult[] mathResults = {
-            new MathResult("0.1 + 0.2"),
-            new MathResult("0.1 + 0.7")
+            new MathResult("0.1 + 0.2") { CSharpResult = 0.1 + 0.2 },
+            new MathResult("0.1 + 0.7") { CSharpResult = 0.1 + 0.7 }
         };
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        mathResults[0].CSharpResult = 0.1 + 0.2;
-        mathResults[1].CSharpResult = 0.1 + 0.7;
+        for (int i = 0; i < mathResults.Length; i++)
+        {
+            mathResults[i].JsResult = await JSRuntime.InvokeAsync<decimal>("getCalculationResult", i);
+        }
     }
 
     public class MathResult {
