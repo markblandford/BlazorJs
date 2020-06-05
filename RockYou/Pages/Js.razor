@@ -1,0 +1,52 @@
+@page "/js"
+
+<h1>Using JavaScript</h1>
+
+<table class="table" id="math-compare-table">
+    <caption>How does Maths Work?</caption>
+    <thead>
+        <tr>
+            <td></td>
+            <th scope="col">
+                <img src="images/js.png" alt="JavaScript"/>
+            </th>
+            <th scope="col">
+                <img src="images/csharp.png" alt="C#"/>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var m in mathResults)
+        {
+            <tr>
+                <th scope="row">@m.Calculation</th>
+                <td>@m.JsResult</td>
+                <td>@m.CSharpResult</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    private MathResult[] mathResults = {
+            new MathResult("0.1 + 0.2"),
+            new MathResult("0.1 + 0.7")
+        };
+
+    protected override void OnInitialized()
+    {
+        mathResults[0].CSharpResult = 0.1 + 0.2;
+        mathResults[1].CSharpResult = 0.1 + 0.7;
+    }
+
+    public class MathResult {
+        public MathResult(string calc)
+        {
+            Calculation = calc;
+        }
+        public string Calculation { get; set; }
+        public decimal JsResult { get; set; }
+        public double CSharpResult { get; set; }
+    }
+}
